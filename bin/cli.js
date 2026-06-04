@@ -111,6 +111,10 @@ switch (command) {
     const scriptArgs = [];
     if (intervalIdx !== -1 && args[intervalIdx + 1]) {
       const hours = args[intervalIdx + 1];
+      if (!/^\d+$/.test(hours) || parseInt(hours) < 1 || parseInt(hours) > 24) {
+        console.error("Error: --interval must be a number between 1 and 24");
+        process.exit(1);
+      }
       if (isWindows) {
         scriptArgs.push("-IntervalHours", hours);
       } else {

@@ -26,8 +26,8 @@ if [ "$OS" = "Darwin" ]; then
     fi
 else
     # Linux: remove cron entry
-    if crontab -l 2>/dev/null | grep -q "claude-ping"; then
-        (crontab -l 2>/dev/null | grep -v "claude-ping") | crontab -
+    if crontab -l 2>/dev/null | grep -q "# claude-code-ping"; then
+        (crontab -l 2>/dev/null | grep -v "# claude-code-ping") | crontab -
         echo "[OK] Removed cron entry"
     else
         echo "[--] No cron entry found"

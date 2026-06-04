@@ -2,6 +2,10 @@
 set -euo pipefail
 
 INTERVAL_HOURS="${1:-5}"
+if ! [[ "$INTERVAL_HOURS" =~ ^[0-9]+$ ]] || [ "$INTERVAL_HOURS" -lt 1 ] || [ "$INTERVAL_HOURS" -gt 24 ]; then
+    echo "ERROR: Interval must be a number between 1 and 24 (hours)."
+    exit 1
+fi
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INSTALL_DIR="$HOME/.claude-ping"
 TASK_NAME="com.claude-ping"
@@ -89,10 +93,10 @@ EOF
 
 else
     # Linux: use cron
-    CRON_ENTRY="0 */${INTERVAL_HOURS} * * * /bin/bash $INSTALL_DIR/claude-ping.sh"
+    CRON_ENTRY="0 */${INTERVAL_HOURS} * * * /bin/bash \"${INSTALL_DIR}/claude-ping.sh\" # claude-code-ping"
 
-    # Remove existing claude-ping entries, add new one
-    (crontab -l 2>/dev/null | grep -v "claude-ping" || true; echo "$CRON_ENTRY") | crontab -
+    # Remove existing claude-code-ping entries (matched by trailing comment), add new one
+    (crontab -l 2>/dev/null | grep -v "# claude-code-ping" || true; echo "$CRON_ENTRY") | crontab -
     echo "[OK] Cron entry added (every ${INTERVAL_HOURS}h)"
 fi
 
