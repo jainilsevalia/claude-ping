@@ -2,3 +2,4 @@
 .claude-ping/
 .DS_Store
 Thumbs.db
+node_modules/

@@ -1,0 +1,38 @@
+{
+  "name": "claude-code-ping",
+  "version": "1.0.0",
+  "description": "Keep your Claude Code rate-limit window working for you. Zero-dependency cross-platform scheduled pinger.",
+  "bin": {
+    "claude-code-ping": "bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "rate-limit",
+    "productivity",
+    "automation",
+    "cli",
+    "scheduled-task",
+    "cron",
+    "launchd"
+  ],
+  "author": "Jainil Sevalia",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jainilsevalia/claude-ping.git"
+  },
+  "homepage": "https://github.com/jainilsevalia/claude-ping#readme",
+  "bugs": {
+    "url": "https://github.com/jainilsevalia/claude-ping/issues"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}

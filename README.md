@@ -3,6 +3,7 @@
 > Keep your Claude Code rate-limit window working for you, not against you.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/claude-code-ping.svg)](https://www.npmjs.com/package/claude-code-ping)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-brightgreen.svg)](#quick-start)
 [![Release](https://img.shields.io/github/v/release/jainilsevalia/claude-ping)](https://github.com/jainilsevalia/claude-ping/releases)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-orange.svg)](#how-its-implemented)
@@ -54,7 +55,23 @@ need it most.
 
 ## Quick Start
 
-### Windows (PowerShell — Run as Administrator)
+### One-liner (all platforms)
+
+```bash
+npx claude-code-ping install
+```
+
+### Or install globally
+
+```bash
+npm install -g claude-code-ping
+claude-code-ping install
+```
+
+### Or clone manually
+
+<details>
+<summary>Windows (PowerShell — Run as Administrator)</summary>
 
 ```powershell
 git clone https://github.com/jainilsevalia/claude-ping.git
@@ -62,7 +79,10 @@ cd claude-ping
 .\scripts\install.ps1
 ```
 
-### macOS
+</details>
+
+<details>
+<summary>macOS / Linux</summary>
 
 ```bash
 git clone https://github.com/jainilsevalia/claude-ping.git
@@ -70,37 +90,33 @@ cd claude-ping
 bash scripts/install.sh
 ```
 
-### Linux
+</details>
+
+## Commands
 
 ```bash
-git clone https://github.com/jainilsevalia/claude-ping.git
-cd claude-ping
-bash scripts/install.sh
+claude-code-ping install [--interval <hours>]   # Set up scheduled pinging (default: 5h)
+claude-code-ping uninstall                      # Remove scheduled task and logs
+claude-code-ping ping                           # Run a single ping now
+claude-code-ping status                         # Check if scheduler is active
+claude-code-ping --help                         # Show help
 ```
 
 ## Configuration
 
 | Setting | Default | How to change |
 |---------|---------|---------------|
-| Interval | 5 hours | `.\scripts\install.ps1 -IntervalHours 4` or `bash scripts/install.sh 4` |
+| Interval | 5 hours | `claude-code-ping install --interval 4` |
 | Model | `claude-haiku-4-5-20251001` | Set `CLAUDE_PING_MODEL` environment variable |
 | Log location | `~/.claude-ping/claude-ping.log` | Fixed (logs auto-rotate at 1 MB) |
 
 ## Uninstall
 
-### Windows (Run as Administrator)
-
-```powershell
-.\scripts\uninstall.ps1
-```
-
-### macOS / Linux
-
 ```bash
-bash scripts/uninstall.sh
+claude-code-ping uninstall
 ```
 
-Uninstall removes the scheduled task and the `~/.claude-ping/` directory completely.
+Removes the scheduled task and the `~/.claude-ping/` directory completely.
 
 ## Requirements
 
@@ -137,7 +153,7 @@ The ping script logs failures with exit codes. Check `~/.claude-ping/claude-ping
 | macOS | launchd (LaunchAgent) | Bash |
 | Linux | cron | Bash |
 
-No Node.js. No Docker. No GitHub Actions. Just the tools your OS already has.
+Node.js is only used as a thin CLI wrapper. The actual scheduling and pinging uses OS-native tools — no background Node processes.
 
 ## License
 
