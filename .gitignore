@@ -1,0 +1,4 @@
+*.log
+.claude-ping/
+.DS_Store
+Thumbs.db
