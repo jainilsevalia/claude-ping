@@ -28,7 +28,7 @@ Claude Code's usage limits operate on a **5-hour rolling window**. The window st
                                           Next fresh budget: 2 PM.
 ```
 
-**With claude-ping** — pings every 5h starting early (e.g., 5:30 AM):
+**With claude-ping** — `claude-code-ping install --start-at 05:30` pings every 5h:
 
 ```
 12AM  1    2    3    4    5    6    7    8    9    10   11   12PM
@@ -95,11 +95,15 @@ bash scripts/install.sh
 ## Commands
 
 ```bash
-claude-code-ping install [--interval <hours>]   # Set up scheduled pinging (default: 5h)
+claude-code-ping install [options]              # Set up scheduled pinging
 claude-code-ping uninstall                      # Remove scheduled task and logs
 claude-code-ping ping                           # Run a single ping now
 claude-code-ping status                         # Check if scheduler is active
 claude-code-ping --help                         # Show help
+
+# Options for install:
+#   --interval <hours>    Hours between pings (1-24, default: 5)
+#   --start-at <HH:MM>   Anchor pings to a specific time (24-hour format)
 ```
 
 ## Configuration
@@ -107,6 +111,7 @@ claude-code-ping --help                         # Show help
 | Setting | Default | How to change |
 |---------|---------|---------------|
 | Interval | 5 hours | `claude-code-ping install --interval 4` |
+| Start time | Not set (starts immediately) | `claude-code-ping install --start-at 04:00` |
 | Model | `claude-haiku-4-5-20251001` | Set `CLAUDE_PING_MODEL` environment variable |
 | Log location | `~/.claude-ping/claude-ping.log` | Fixed (logs auto-rotate at 1 MB) |
 
@@ -140,6 +145,10 @@ You absolutely can. This tool automates the setup, adds logging with rotation, h
 **What if claude CLI isn't in PATH for the scheduled task?**
 
 The install scripts detect Claude's location and configure the scheduler accordingly. On macOS, the launchd plist includes common Claude install paths. On Linux, the ping script sources your shell profile before running.
+
+**How do I choose the best start time?**
+
+Early morning (4–5 AM) works well for most people. The first ping anchors your window, and the reset lands around 9–10 AM — right when you start working. Use `--start-at 04:00` or `--start-at 05:00`.
 
 **What if my auth token expires?**
 

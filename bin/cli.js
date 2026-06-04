@@ -13,15 +13,22 @@ const USAGE = `
 claude-code-ping — Keep your Claude Code rate-limit window working for you.
 
 Usage:
-  claude-code-ping install [--interval <hours>]   Set up scheduled pinging
+  claude-code-ping install [options]              Set up scheduled pinging
   claude-code-ping uninstall                      Remove scheduled task and logs
   claude-code-ping ping                           Run a single ping now
   claude-code-ping status                         Check if scheduler is active
   claude-code-ping --help                         Show this help
 
+Options:
+  --interval <hours>    Hours between pings (1-24, default: 5)
+  --start-at <HH:MM>   Anchor pings to a specific time (24-hour format)
+
 Examples:
   npx claude-code-ping install                    Install with default 5h interval
   npx claude-code-ping install --interval 4       Install with 4h interval
+  npx claude-code-ping install --start-at 04:00   Anchor pings starting at 4 AM
+  npx claude-code-ping install --start-at 04:00 --interval 5
+                                                  Ping at 4:00, 9:00, 14:00, 19:00
   npx claude-code-ping status                     Check status and recent pings
 `.trim();
 
@@ -108,19 +115,40 @@ if (!command || command === "--help" || command === "-h") {
 switch (command) {
   case "install": {
     const intervalIdx = args.indexOf("--interval");
+    const startAtIdx = args.indexOf("--start-at");
     const scriptArgs = [];
+    let intervalHours = "5";
+
     if (intervalIdx !== -1 && args[intervalIdx + 1]) {
       const hours = args[intervalIdx + 1];
       if (!/^\d+$/.test(hours) || parseInt(hours) < 1 || parseInt(hours) > 24) {
         console.error("Error: --interval must be a number between 1 and 24");
         process.exit(1);
       }
-      if (isWindows) {
-        scriptArgs.push("-IntervalHours", hours);
-      } else {
-        scriptArgs.push(hours);
+      intervalHours = hours;
+    }
+
+    let startAt = "";
+    if (startAtIdx !== -1 && args[startAtIdx + 1]) {
+      startAt = args[startAtIdx + 1];
+      if (!/^([01]\d|2[0-3]):([0-5]\d)$/.test(startAt)) {
+        console.error(
+          "Error: --start-at must be in HH:MM format (24-hour, e.g. 04:00)"
+        );
+        process.exit(1);
       }
     }
+
+    if (isWindows) {
+      scriptArgs.push("-IntervalHours", intervalHours);
+      if (startAt) {
+        scriptArgs.push("-StartAt", startAt);
+      }
+    } else {
+      scriptArgs.push(intervalHours);
+      scriptArgs.push(startAt);
+    }
+
     runScript("install", scriptArgs);
     break;
   }

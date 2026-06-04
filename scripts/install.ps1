@@ -1,5 +1,6 @@
 param(
-    [int]$IntervalHours = 5
+    [int]$IntervalHours = 5,
+    [string]$StartAt = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -9,7 +10,11 @@ $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIde
 if (-not $isAdmin) {
     Write-Host "Requesting administrator privileges..." -ForegroundColor Yellow
     $scriptPath = $MyInvocation.MyCommand.Path
-    Start-Process PowerShell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -IntervalHours $IntervalHours"
+    $elevateArgs = "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`" -IntervalHours $IntervalHours"
+    if ($StartAt -ne "") {
+        $elevateArgs += " -StartAt `"$StartAt`""
+    }
+    Start-Process PowerShell -Verb RunAs -ArgumentList $elevateArgs
     exit
 }
 
@@ -51,9 +56,19 @@ $action = New-ScheduledTaskAction `
     -Execute "PowerShell.exe" `
     -Argument "-NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$scriptDest`""
 
+# Determine trigger start time
+if ($StartAt -ne "") {
+    $targetTime = [DateTime]::ParseExact($StartAt, "HH:mm", $null)
+    if ($targetTime -lt (Get-Date)) {
+        $targetTime = $targetTime.AddDays(1)
+    }
+} else {
+    $targetTime = Get-Date
+}
+
 $trigger = New-ScheduledTaskTrigger `
     -Once `
-    -At (Get-Date) `
+    -At $targetTime `
     -RepetitionInterval (New-TimeSpan -Hours $IntervalHours) `
     -RepetitionDuration ([TimeSpan]::MaxValue)
 
@@ -73,12 +88,17 @@ Register-ScheduledTask `
 Write-Host "[OK] Scheduled task 'ClaudePing' created (every ${IntervalHours}h)" -ForegroundColor Green
 
 # Show summary
-$nextRun = (Get-Date).AddHours($IntervalHours).ToString("yyyy-MM-dd HH:mm:ss")
 Write-Host ""
 Write-Host "Installation complete!" -ForegroundColor Green
 Write-Host "  Interval:  every ${IntervalHours} hours"
+if ($StartAt -ne "") {
+    Write-Host "  Start at:  $StartAt"
+    Write-Host "  First run: $($targetTime.ToString('yyyy-MM-dd HH:mm:ss'))"
+} else {
+    $nextRun = (Get-Date).AddHours($IntervalHours).ToString("yyyy-MM-dd HH:mm:ss")
+    Write-Host "  Next ping: ~$nextRun"
+}
 Write-Host "  Script:    $scriptDest"
 Write-Host "  Log:       $installDir\claude-ping.log"
-Write-Host "  Next ping: ~$nextRun"
 Write-Host ""
 Write-Host "To uninstall: .\scripts\uninstall.ps1" -ForegroundColor Gray
