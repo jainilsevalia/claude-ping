@@ -1,6 +1,6 @@
 {
   "name": "claude-code-ping",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Keep your Claude Code rate-limit window working for you. Zero-dependency cross-platform scheduled pinger.",
   "bin": {
     "claude-code-ping": "bin/cli.js"

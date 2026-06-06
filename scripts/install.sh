@@ -54,11 +54,12 @@ build_hour_list() {
     local start_minute=$2
     local interval=$3
     local h=$start_hour
+    local count=$(( 24 / interval ))
+    [ $(( count * interval )) -lt 24 ] && count=$(( count + 1 ))
     HOUR_LIST=""
-    while true; do
+    for (( i=0; i<count; i++ )); do
         HOUR_LIST="${HOUR_LIST:+$HOUR_LIST,}$h"
         h=$(( (h + interval) % 24 ))
-        [ "$h" -eq "$start_hour" ] && break
     done
     START_MINUTE=$start_minute
 }
